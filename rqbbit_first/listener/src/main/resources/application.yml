@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  cloud:
+    stream:
+      default:
+        contentType: application/json
+      bindings:
+        input:
+          destination: orders.exchange
+          group: listener_
+        output:
+          destination: fail.exchange
+      rabbit:
+        bindings:
+          input:
+            consumer:
+              queueNameGroupOnly: true
+              bindingRoutingKey: routing-queue_
+              requeueRejected: true
+              bindQueue: true
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /

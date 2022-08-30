@@ -1,0 +1,30 @@
+logging:
+  level:
+    org.springframework.amqp.rabbit: DEBUG
+
+spring:
+  cloud:
+    stream:
+      default:
+        contentType: application/json
+      bindings:
+        output:
+          destination: orders.exchange
+      rabbit:
+        bindings:
+          output:
+            exchangeType: topic
+            producer:
+              routingKeyExpression: headers['customRoutingKey']
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+

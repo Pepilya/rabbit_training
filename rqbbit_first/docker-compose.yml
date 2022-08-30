@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    container_name: rabbitmq
+    expose:
+      - 5672
+      - 15672
+    ports:
+      - 5672:5672
+      - 15672:15672
+  producer:
+    container_name: producer
+    build: producer/
+    ports:
+      - 8080:8080
+    environment:
+      - spring.cloud.stream.binders.rabbitmq.environment.spring.rabbitmq.host=rabbitmq
+      - spring.cloud.stream.rabbit.bindings.output-queue1.exchangeType=topic
+    depends_on:
+      - rabbitmq
+  listener_1:
+    build: listener/
+    container_name: listener_1
+    ports:
+      - 8082:8082
+    environment:
+      - spring.cloud.stream.binders.rabbitmq.environment.spring.rabbitmq.host=rabbitmq
+      - spring.cloud.stream.bindings.input.group=listener_1
+      - spring.cloud.stream.rabbit.bindings.input.consumer.bindingRoutingKey=routing-queue_1
+    depends_on:
+      - rabbitmq
+  listener_2:
+    build: listener/
+    container_name: listener_2
+    ports:
+      - 8083:8082
+    environment:
+      - spring.cloud.stream.binders.rabbitmq.environment.spring.rabbitmq.host=rabbitmq
+      - spring.cloud.stream.bindings.input.group=listener_2
+      - spring.cloud.stream.rabbit.bindings.input.consumer.bindingRoutingKey=routing-queue_2
+    depends_on:
+      - rabbitmq
