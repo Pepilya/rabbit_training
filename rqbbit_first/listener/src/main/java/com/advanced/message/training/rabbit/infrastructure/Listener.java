@@ -37,16 +37,17 @@ public class Listener {
             throw new ImmediateAcknowledgeAmqpException(ex.getMessage());
         } catch (ProductAmountExceededException ex) {
             if (isLastAttempt(message)) {
+                log.error("Attempts exceed, give up!");
                 failProducer.sendFailedEvent(new Error(Error.PRODUCT_NOT_AVAILABLE_CODE, Error.PRODUCT_NOT_AVAILABLE_MESSAGE));
                 throw new ImmediateAcknowledgeAmqpException(ex.getMessage());
             }
-            throw new AmqpRejectAndDontRequeueException("failed");
+            throw new RuntimeException("Failed attempt");
         }
     }
 
     private boolean isLastAttempt(Message<Order> message) {
         List<MessageHeaders> myAttempts = message.getHeaders().get("deliveryAttempt", List.class);
-        Map<String, Object> death = (Map<String, Object>)myAttempts != null && myAttempts.size() > 0 ? myAttempts.get(0) : null;
+        Map<String, Object> death = (Map<String, Object>) myAttempts != null && myAttempts.size() > 0 ? myAttempts.get(0) : null;
         return (death != null && (long) death.get("count") > MAX_ATTEMPTS_COUNT);
     }
 
