@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor
@@ -46,9 +47,8 @@ public class Listener {
     }
 
     private boolean isLastAttempt(Message<Order> message) {
-        List<MessageHeaders> myAttempts = message.getHeaders().get("deliveryAttempt", List.class);
-        Map<String, Object> death = (Map<String, Object>) myAttempts != null && myAttempts.size() > 0 ? myAttempts.get(0) : null;
-        return (death != null && (long) death.get("count") > MAX_ATTEMPTS_COUNT);
+        AtomicInteger myAttempts = message.getHeaders().get("deliveryAttempt", AtomicInteger.class);
+        return (myAttempts.get() > MAX_ATTEMPTS_COUNT);
     }
 
 }

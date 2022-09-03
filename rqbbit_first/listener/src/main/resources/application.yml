@@ -9,9 +9,9 @@ spring:
       bindings:
         input:
           destination: orders.exchange
-          group: listener_
+          group: listener_1
           consumer:
-            maxAttempts: 2
+            maxAttempts: 3
         output:
           destination: fail.exchange
       rabbit:
@@ -19,7 +19,7 @@ spring:
           input:
             consumer:
               queueNameGroupOnly: true
-              bindingRoutingKey: routing-queue_
+              bindingRoutingKey: routing-queue_1
               requeueRejected: true
       binders:
         rabbitmq:
