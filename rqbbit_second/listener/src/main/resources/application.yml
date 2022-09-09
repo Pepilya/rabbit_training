@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+spring:
+  cloud:
+    stream:
+      default:
+        contentType: application/json
+      bindings:
+        orders:
+          destination: orders.exchange
+          group: listener_1
+          consumer:
+            maxAttempts: 1
+        fail:
+          destination: fail.exchange
+      rabbit:
+        bindings:
+          orders:
+            consumer:
+              queueNameGroupOnly: true
+              bindingRoutingKey: routing-queue_2
+              requeueRejected: false
+              autoBindDlq: true
+              deadLetterExchange: retry-exchange
+              deadLetterQueueName: retry-queue
+              dlq-ttl: 5000
+              republishToDlq: false
+              dlqDeadLetterExchange:
+      binders:
+        rabbitmq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
